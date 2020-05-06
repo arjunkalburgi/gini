@@ -8,21 +8,8 @@ import { RectButton, ScrollView } from 'react-native-gesture-handler';
 export default class LinksScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { searchText: '' };
+    this.state = { searchText: '', refreshList: false };
   }
-
-  data = [
-    { key: 'Devin' },
-    { key: 'Dan' },
-    { key: 'Dominic' },
-    { key: 'Jackson' },
-    { key: 'James' },
-    { key: 'Joel' },
-    { key: 'John' },
-    { key: 'Jillian' },
-    { key: 'Jimmy' },
-    { key: 'Julie' },
-  ];
 
   setSearchText(text) {
     this.setState({
@@ -53,13 +40,18 @@ export default class LinksScreen extends React.Component {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      this.data = responseJson;
-      return console.table(responseJson);
+      // only refresh the data if it's worth refreshing
+      if (responseJson.common || responseJson.branded) {
+        this.data = responseJson;
+        this.refreshList();
+      }
     })
     .catch((error) => {
       console.error(error);
     });
   };
+
+  refreshList = () => this.setState({ refreshList: !this.state.refreshList })
   
   render() {
     return (
@@ -83,37 +75,51 @@ export default class LinksScreen extends React.Component {
           </View>
         </View>
 
-        <FlatListBasics data={this.data} />
+        <FlatListBasics data={this.data} refresh={this.state.refreshList} />
 
       </ScrollView>
     );
   }
 }
 
-function OptionButton({ icon, label, onPress, isLastOption }) {
-  return (
-    <RectButton style={[styles.option, isLastOption && styles.lastOption]} onPress={onPress}>
-      <View style={{ flexDirection: 'row' }}>
-        <View style={styles.optionIconContainer}>
-          <Ionicons name={icon} size={22} color="rgba(0,0,0,0.35)" />
-        </View>
-        <View style={styles.optionTextContainer}>
-          <Text style={styles.optionText}>{label}</Text>
-        </View>
-      </View>
-    </RectButton>
-  );
-}
+class FlatListBasics extends React.Component {
+  state = {
+    refresh: false,
+    data: [
+      { key: 'Devin' },
+      { key: 'Dan' },
+      { key: 'Dominic' },
+      { key: 'Jackson' },
+      { key: 'James' },
+      { key: 'Joel' },
+      { key: 'John' },
+      { key: 'Jillian' },
+      { key: 'Jimmy' },
+      { key: 'Julie' },
+    ]
+  }
 
-function FlatListBasics({data}) {
-  return (
-    <View style={styles.container}>
-      <FlatList
-        data={data}
-        renderItem={({ item }) => <Text style={styles.item}>{item.key}</Text>}
-      />
-    </View>
-  );
+  componentWillReceiveProps(props) {
+    const { refresh, data } = this.props;
+    if (props.refresh !== refresh && data != undefined) {
+      this.setState({
+        data: data.common, 
+        refresh: !this.state.refresh
+      })
+    }
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <FlatList
+          data={this.state.data}
+          extraData={this.state.refresh}
+          renderItem={({ item }) => <Text style={styles.item}>{JSON.stringify(item)}</Text>}
+        />
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
