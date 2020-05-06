@@ -61,21 +61,12 @@ export default class LinksScreen extends React.Component {
 
         <Text>Use the searchbar to look for foods</Text>
       
-        <View style={styles.searchbar}>
-          <View style={{ flex: 4 }}>
-            <TextInput
-              onChangeText={(textEntry) => { this.setSearchText(textEntry); this.getFood(); }}
-              style={{ backgroundColor: 'transparent' }}
-              onSubmitEditing={() => { this.getFood() }}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <TouchableOpacity
-              onPress={() => this.getFood()}>
-              <Text>Search</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <TextInput
+          style={styles.searchbar}
+          placeholder="Search for foods..."
+          onChangeText={(textEntry) => { this.setSearchText(textEntry); this.getFood(); }}
+          onSubmitEditing={() => { this.getFood() }}
+        />
 
         <SearchList data={this.data} refresh={this.state.refreshList} />
 
@@ -116,6 +107,7 @@ const styles = StyleSheet.create({
     padding: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2, borderColor: '#888', borderRadius: 10, backgroundColor: '#fff'
+    borderWidth: 2, borderColor: '#888', borderRadius: 10, backgroundColor: '#fff',
+    backgroundColor: 'transparent'
   },
 });

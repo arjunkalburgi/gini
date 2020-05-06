@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, FlatList, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, FlatList, Text, View, Button } from 'react-native';
 
 export default class SearchList extends React.Component {
     state = {
@@ -22,19 +22,30 @@ export default class SearchList extends React.Component {
         const { refresh, data } = this.props;
         if (props.refresh !== refresh && data != undefined) {
             this.setState({
-                data: data.common,
+                data: [...data.common, ...data.branded],
                 refresh: !this.state.refresh
             })
         }
     }
 
     render() {
+        // console.table(this.state.data[0]);
         return (
             <View style={styles.container}>
                 <FlatList
                     data={this.state.data}
                     extraData={this.state.refresh}
-                    renderItem={({ item }) => <Text style={styles.item}>{JSON.stringify(item)}</Text>}
+                    renderItem={({ item }) => <View style={styles.item}>
+                        <View style={styles.item_text}>
+                            <Text style={styles.item_title}>{item.food_name ? item.food_name : item.key}</Text>
+                            <Text style={styles.item_detail}>{item.serving_unit}</Text>
+                        </View>
+                        <Button
+                            title="Add"
+                            color="#841584"
+                            accessibilityLabel="Learn more about this purple button"
+                        ></Button>
+                    </View>}
                 />
             </View>
         );
@@ -49,6 +60,15 @@ const styles = StyleSheet.create({
     item: {
         padding: 10,
         fontSize: 18,
-        height: 44,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignContent: 'center',
+    },
+    item_text: { justifyContent: 'center', flex: 6 },
+    item_title: {
+        fontSize: 18,
+    },
+    item_detail: {
+        fontSize: 14,
     },
 });
