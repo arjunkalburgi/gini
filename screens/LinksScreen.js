@@ -2,16 +2,36 @@ import { Ionicons } from '@expo/vector-icons';
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, FlatList, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
-export default function LinksScreen() {
-  const [searchText, setsearchText] = useState('');
+export default class LinksScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { searchText: '' };
+  }
 
-  const data = [];
+  data = [
+    { key: 'Devin' },
+    { key: 'Dan' },
+    { key: 'Dominic' },
+    { key: 'Jackson' },
+    { key: 'James' },
+    { key: 'Joel' },
+    { key: 'John' },
+    { key: 'Jillian' },
+    { key: 'Jimmy' },
+    { key: 'Julie' },
+  ];
 
-  const getFood = () => {
-    fetch(`https://trackapi.nutritionix.com/v2/search/instant?query=${searchText}&self=true&branded=true&common=true&detailed=false&claims=false`, {
+  setSearchText(text) {
+    this.setState({
+      searchText: text
+    })
+  }
+
+  getFood() {
+    fetch(`https://trackapi.nutritionix.com/v2/search/instant?query=${this.state.searchText}&self=true&branded=true&common=true&detailed=false&claims=false`, {
       method: 'GET',
       headers: {
         Accept: 'application/json',
@@ -33,6 +53,7 @@ export default function LinksScreen() {
     })
     .then((response) => response.json())
     .then((responseJson) => {
+      this.data = responseJson;
       return console.table(responseJson);
     })
     .catch((error) => {
@@ -40,29 +61,33 @@ export default function LinksScreen() {
     });
   };
   
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+  render() {
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
-      <Text>Use the searchbar to look for foods</Text>
-    
-      <View style={styles.searchbar}>
-        <View style={{ flex: 4 }}>
-          <TextInput
-            onChangeText={(textEntry) => { setsearchText(textEntry); getFood(); }}
-            style={{ backgroundColor: 'transparent' }}
-            onSubmitEditing={() => { getFood() }}
-          />
+        <Text>Use the searchbar to look for foods</Text>
+      
+        <View style={styles.searchbar}>
+          <View style={{ flex: 4 }}>
+            <TextInput
+              onChangeText={(textEntry) => { this.setSearchText(textEntry); this.getFood(); }}
+              style={{ backgroundColor: 'transparent' }}
+              onSubmitEditing={() => { this.getFood() }}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              onPress={() => this.getFood()}>
+              <Text>Search</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity
-            onPress={() => getFood()}>
-            <Text>Search</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
 
-    </ScrollView>
-  );
+        <FlatListBasics data={this.data} />
+
+      </ScrollView>
+    );
+  }
 }
 
 function OptionButton({ icon, label, onPress, isLastOption }) {
@@ -77,6 +102,17 @@ function OptionButton({ icon, label, onPress, isLastOption }) {
         </View>
       </View>
     </RectButton>
+  );
+}
+
+function FlatListBasics({data}) {
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={data}
+        renderItem={({ item }) => <Text style={styles.item}>{item.key}</Text>}
+      />
+    </View>
   );
 }
 
@@ -114,5 +150,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2, borderColor: '#888', borderRadius: 10, backgroundColor: '#fff'
-  }
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
 });
