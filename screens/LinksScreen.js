@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { StyleSheet, FlatList, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
+import SearchList from '../components/SearchList';
+
 export default class LinksScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -75,53 +77,12 @@ export default class LinksScreen extends React.Component {
           </View>
         </View>
 
-        <FlatListBasics data={this.data} refresh={this.state.refreshList} />
+        <SearchList data={this.data} refresh={this.state.refreshList} />
 
       </ScrollView>
     );
   }
 }
-
-class FlatListBasics extends React.Component {
-  state = {
-    refresh: false,
-    data: [
-      { key: 'Devin' },
-      { key: 'Dan' },
-      { key: 'Dominic' },
-      { key: 'Jackson' },
-      { key: 'James' },
-      { key: 'Joel' },
-      { key: 'John' },
-      { key: 'Jillian' },
-      { key: 'Jimmy' },
-      { key: 'Julie' },
-    ]
-  }
-
-  componentWillReceiveProps(props) {
-    const { refresh, data } = this.props;
-    if (props.refresh !== refresh && data != undefined) {
-      this.setState({
-        data: data.common, 
-        refresh: !this.state.refresh
-      })
-    }
-  }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <FlatList
-          data={this.state.data}
-          extraData={this.state.refresh}
-          renderItem={({ item }) => <Text style={styles.item}>{JSON.stringify(item)}</Text>}
-        />
-      </View>
-    );
-  }
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -156,10 +117,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2, borderColor: '#888', borderRadius: 10, backgroundColor: '#fff'
-  },
-  item: {
-    padding: 10,
-    fontSize: 18,
-    height: 44,
   },
 });
