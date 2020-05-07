@@ -28,8 +28,26 @@ export default class SearchList extends React.Component {
         }
     }
 
+    viewFood() {
+        fetch(`https://trackapi.nutritionix.com/v2/natural/nutrients`, {
+            method: 'POST', redirect: 'follow',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'x-app-id': '61aca91d',
+                'x-app-key': '47240e9bd8d46633bab0cd154335e8e7',
+                'x-remote-user-id': 132,
+            },
+            body: JSON.stringify({ query: `1 cup chicken noodle soup`, }),
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            console.table(responseJson)
+        })
+        .catch((error) => { console.error(error); });
+    }
+
     render() {
-        // console.table(this.state.data[0]);
         return (
             <View style={styles.container}>
                 <FlatList
@@ -41,7 +59,8 @@ export default class SearchList extends React.Component {
                             <Text style={styles.item_detail}>{item.serving_unit}</Text>
                         </View>
                         <Button
-                            title="Add"
+                            onPress={() => {this.viewFood()}}
+                            title="View"
                             color="#841584"
                             accessibilityLabel="Learn more about this purple button"
                         ></Button>
@@ -59,7 +78,6 @@ const styles = StyleSheet.create({
     },
     item: {
         padding: 10,
-        fontSize: 18,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignContent: 'center',

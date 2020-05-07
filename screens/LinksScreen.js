@@ -48,9 +48,7 @@ export default class LinksScreen extends React.Component {
         this.refreshList();
       }
     })
-    .catch((error) => {
-      console.error(error);
-    });
+    .catch((error) => { console.error(error); });
   };
 
   refreshList = () => this.setState({ refreshList: !this.state.refreshList })
