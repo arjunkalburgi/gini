@@ -4,23 +4,13 @@ import { StyleSheet, FlatList, Text, View, Button } from 'react-native';
 export default class SearchList extends React.Component {
     state = {
         refresh: false,
-        data: [
-            { key: 'Devin' },
-            { key: 'Dan' },
-            { key: 'Dominic' },
-            { key: 'Jackson' },
-            { key: 'James' },
-            { key: 'Joel' },
-            { key: 'John' },
-            { key: 'Jillian' },
-            { key: 'Jimmy' },
-            { key: 'Julie' },
-        ]
+        data: []
     }
 
     componentWillReceiveProps(props) {
         const { refresh, data } = this.props;
         if (props.refresh !== refresh && data != undefined) {
+            this.state.food = null;
             this.setState({
                 data: [...data.common, ...data.branded],
                 refresh: !this.state.refresh
@@ -46,6 +36,7 @@ export default class SearchList extends React.Component {
             const food_name = responseJson.foods[0].food_name, full_nutrients = responseJson.foods[0].full_nutrients;
             const nutritionixPayload = responseJson.foods[0];
             console.log('got payload', JSON.stringify(nutritionixPayload));
+            this.setState({ food: nutritionixPayload })
             
             fetch(`https://us-central1-gini-v0.cloudfunctions.net/analyseNutritionixTest`, {
                 method: 'POST',
@@ -67,27 +58,58 @@ export default class SearchList extends React.Component {
         .catch((error) => { console.error(error); });
     }
 
-    render() {
-        return (
-            <View style={styles.container}>
+    addFood() {}
+
+    render = () => {
+        if (this.state.food != null) {
+            return (<View style={styles.container}>
+                <Text style={styles.item}>{this.state.food.food_name}</Text>
+                <Text style={styles.item}>serving_qty: {this.state.food.serving_qty}</Text>
+                <Text style={styles.item}>serving_unit: {this.state.food.serving_unit}</Text>
+                <Text style={styles.item}>serving_weight_grams: {this.state.food.serving_weight_grams}</Text>
+                <Text style={styles.item}>calories: {this.state.food.nf_calories}</Text>
+                <Text style={styles.item}>total_fat: {this.state.food.nf_total_fat}</Text>
+                <Text style={styles.item}>saturated_fat: {this.state.food.nf_saturated_fat}</Text>
+                <Text style={styles.item}>cholesterol: {this.state.food.nf_cholesterol}</Text>
+                <Text style={styles.item}>sodium: {this.state.food.nf_sodium}</Text>
+                <Text style={styles.item}>total_carbohydrate: {this.state.food.nf_total_carbohydrate}</Text>
+                <Text style={styles.item}>dietary_fiber: {this.state.food.nf_dietary_fiber}</Text>
+                <Text style={styles.item}>sugars: {this.state.food.nf_sugars}</Text>
+                <Text style={styles.item}>protein: {this.state.food.nf_protein}</Text>
+                <Text style={styles.item}>potassium: {this.state.food.nf_potassium}</Text>
+                <Text style={styles.item}>p: {this.state.food.nf_p}</Text>
+                <Button
+                    onPress={() => { this.addFood() }}
+                    title="Add to Journal"
+                    color="#841584"
+                    accessibilityLabel="Learn more about this purple button"
+                ></Button>
+
+            </View>)
+        } else if (this.state.data != []) {
+            return (<View style={styles.container}>
                 <FlatList
                     data={this.state.data}
                     extraData={this.state.refresh}
-                    renderItem={({ item }) => <View style={styles.item}>
-                        <View style={styles.item_text}>
-                            <Text style={styles.item_title}>{item.food_name ? item.food_name : item.key}</Text>
-                            <Text style={styles.item_detail}>{item.serving_unit}</Text>
+                    renderItem={({ item }) =>
+                        <View style={styles.item}>
+                            <View style={styles.item_text}>
+                                <Text style={styles.item_title}>{item.food_name ? item.food_name : item.key}</Text>
+                                <Text style={styles.item_detail}>{item.serving_unit}</Text>
+                            </View>
+                            <Button
+                                onPress={() => { this.viewFood() }}
+                                title="View"
+                                color="#841584"
+                                accessibilityLabel="Learn more about this purple button"
+                            ></Button>
                         </View>
-                        <Button
-                            onPress={() => {this.viewFood()}}
-                            title="View"
-                            color="#841584"
-                            accessibilityLabel="Learn more about this purple button"
-                        ></Button>
-                    </View>}
+                    }
                 />
-            </View>
-        );
+            </View>)
+        } else {
+            return (<View style={styles.container}><Text>Empty State, search for a food</Text></View>)
+        }
     }
 }
 
