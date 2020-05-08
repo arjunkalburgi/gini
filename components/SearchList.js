@@ -18,7 +18,7 @@ export default class SearchList extends React.Component {
         }
     }
 
-    viewFood() {
+    viewFood(query) {
         fetch(`https://trackapi.nutritionix.com/v2/natural/nutrients`, {
             method: 'POST', redirect: 'follow',
             headers: {
@@ -28,7 +28,7 @@ export default class SearchList extends React.Component {
                 'x-app-key': '47240e9bd8d46633bab0cd154335e8e7',
                 'x-remote-user-id': 132,
             },
-            body: JSON.stringify({ query: `1 cup chicken noodle soup`, }),
+            body: JSON.stringify({ query: query, }),
         })
         .then((response) => response.json())
         .then((responseJson) => {
@@ -94,11 +94,11 @@ export default class SearchList extends React.Component {
                     renderItem={({ item }) =>
                         <View style={styles.item}>
                             <View style={styles.item_text}>
-                                <Text style={styles.item_title}>{item.food_name ? item.food_name : item.key}</Text>
+                                <Text style={styles.item_title}>{item.food_name}</Text>
                                 <Text style={styles.item_detail}>{item.serving_unit}</Text>
                             </View>
                             <Button
-                                onPress={() => { this.viewFood() }}
+                                onPress={() => { this.viewFood(`${item.serving_unit} ${item.food_name}`) }}
                                 title="View"
                                 color="#841584"
                                 accessibilityLabel="Learn more about this purple button"
