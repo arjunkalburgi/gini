@@ -42,7 +42,27 @@ export default class SearchList extends React.Component {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-            console.table(responseJson)
+            // console.table('responseJson.foods[0].full_nutrients', responseJson.foods[0].full_nutrients);
+            const food_name = responseJson.foods[0].food_name, full_nutrients = responseJson.foods[0].full_nutrients;
+            const nutritionixPayload = responseJson.foods[0];
+            console.log('got payload', JSON.stringify(nutritionixPayload));
+            
+            fetch(`https://us-central1-gini-v0.cloudfunctions.net/analyseNutritionixTest`, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: {
+                    "Authorization": "Basic c7a5195c11e362086dcd8ce60dcc44ed",
+                    'content-type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify(nutritionixPayload),
+            })
+            .then((response) => response.json())
+            .then((responseJson) => {
+                console.table(responseJson);
+            })
+            .catch((error) => { console.error('API error', error); });
+
         })
         .catch((error) => { console.error(error); });
     }
