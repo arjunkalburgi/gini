@@ -4,16 +4,17 @@ import { StyleSheet, FlatList, Text, View, Button } from 'react-native';
 export default class SearchList extends React.Component {
     state = {
         refresh: false,
-        data: []
+        data: [],
+        food: null,
     }
 
     componentWillReceiveProps(props) {
         const { refresh, data } = this.props;
         if (props.refresh !== refresh && data != undefined) {
-            this.state.food = null;
             this.setState({
                 data: [...data.common, ...data.branded],
-                refresh: !this.state.refresh
+                refresh: !this.state.refresh,
+                food: null
             })
         }
     }
@@ -32,25 +33,24 @@ export default class SearchList extends React.Component {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-            // console.table('responseJson.foods[0].full_nutrients', responseJson.foods[0].full_nutrients);
-            const food_name = responseJson.foods[0].food_name, full_nutrients = responseJson.foods[0].full_nutrients;
             const nutritionixPayload = responseJson.foods[0];
-            console.log('got payload', JSON.stringify(nutritionixPayload));
-            this.setState({ food: nutritionixPayload })
+            this.setState({ food: nutritionixPayload, data: [] });
             
             fetch(`https://us-central1-gini-v0.cloudfunctions.net/analyseNutritionixTest`, {
                 method: 'POST',
                 redirect: 'follow',
                 headers: {
                     "Authorization": "Basic c7a5195c11e362086dcd8ce60dcc44ed",
-                    'content-type': 'application/json',
+                    'Content-Type': 'application/json',
                     Accept: 'application/json',
                 },
                 body: JSON.stringify(nutritionixPayload),
             })
             .then((response) => response.json())
             .then((responseJson) => {
-                console.table(responseJson);
+                const food = this.state.food; 
+                food.score = responseJson.score; 
+                this.setState({ food: food, });
             })
             .catch((error) => { console.error('API error', error); });
 
@@ -58,7 +58,24 @@ export default class SearchList extends React.Component {
         .catch((error) => { console.error(error); });
     }
 
-    addFood() {}
+    addFood() {
+        fetch(`https://us-central1-gini-v0.cloudfunctions.net/logFoodTest`, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: {
+                "Authorization": "Basic c7a5195c11e362086dcd8ce60dcc44ed",
+                'content-type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({data: this.state.food}),
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            console.table(responseJson);
+            this.setState({food: null, data: []});
+        })
+        .catch((error) => { console.error('API error', error); });
+    }
 
     render = () => {
         if (this.state.food != null) {

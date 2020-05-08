@@ -31,14 +31,6 @@ export default class LinksScreen extends React.Component {
         'x-app-key': '47240e9bd8d46633bab0cd154335e8e7',
         Connection: 'keep-alive',
       },
-      // body: JSON.stringify({
-      //   query: `${searchText}`,
-      //   self: false,
-      //   branded: true,
-      //   common: true,
-      //   detailed: false,
-      //   claims: false
-      // }),
     })
     .then((response) => response.json())
     .then((responseJson) => {
