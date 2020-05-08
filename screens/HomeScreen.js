@@ -1,93 +1,92 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { Image, Platform, StyleSheet, Text, FlatList, Button, View } from 'react-native';
 
-import { MonoText } from '../components/StyledText';
+export default class HomeScreen extends React.Component {
+  state = {
+    data: [],
+  }
 
-export default function HomeScreen() {
-  return (
+  componentWillMount() {
+    this.getLog();
+  }
+
+  getLog() {
+    fetch(`https://us-central1-gini-v0.cloudfunctions.net/getLogTest`, {
+      method: 'GET',
+      redirect: 'follow',
+      headers: {
+        "Authorization": "Basic c7a5195c11e362086dcd8ce60dcc44ed",
+        'content-type': 'application/json',
+        Accept: 'application/json',
+      }
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.table(responseJson);
+      this.setState({ data: responseJson });
+    })
+    .catch((error) => { console.error('API error', error); });
+  }
+
+  delFood(idstr) {
+    fetch(`https://us-central1-gini-v0.cloudfunctions.net/deleteLogTest`, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: {
+        "Authorization": "Basic c7a5195c11e362086dcd8ce60dcc44ed",
+        'content-type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({ id: idstr }),
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.table(responseJson);
+      this.setState({ data: responseJson });
+    })
+    .catch((error) => { console.error('API error', error); });
+  }
+
+  render = () => { return (
     <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.welcomeContainer}>
-          <Image
-            source={
-              __DEV__
-                ? require('../assets/images/robot-dev.png')
-                : require('../assets/images/robot-prod.png')
-            }
-            style={styles.welcomeImage}
-          />
-        </View>
-
-        <View style={styles.getStartedContainer}>
-          <DevelopmentModeNotice />
-
-          <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-            <MonoText>screens/HomeScreen.js</MonoText>
-          </View>
-
-          <Text style={styles.getStartedText}>
-            Change any of the text, save the file, and your app will automatically reload.
-          </Text>
-        </View>
-
-        <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
-      <View style={styles.tabBarInfoContainer}>
-        <Text style={styles.tabBarInfoText}>This is a tab bar. You can edit it in:</Text>
-
-        <View style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-          <MonoText style={styles.codeHighlightText}>navigation/BottomTabNavigator.js</MonoText>
-        </View>
+      <View style={styles.welcomeContainer}>
+        <Image
+          source={
+            __DEV__
+              ? require('../assets/images/robot-dev.png')
+              : require('../assets/images/robot-prod.png')
+          }
+          style={styles.welcomeImage}
+        />
       </View>
+      
+      <FlatList
+        data={this.state.data}
+        extraData={this.state.refresh}
+        renderItem={({ item }) =>
+          <View style={styles.item}>
+            <View style={styles.item_text}>
+              <Text style={styles.item_title}>{item.data.food_name}</Text>
+              <Text style={styles.item_detail}>Food Score: {item.data.score}</Text>
+              <Text style={styles.item_detail}>{item.data.serving_qty} {item.data.serving_unit}</Text>
+            </View>
+            <Button
+              onPress={() => { this.delFood(`${item.id}`) }}
+              title="Delete"
+              color="#841584"
+              accessibilityLabel="Learn more about this purple button"
+            ></Button>
+          </View>
+        }
+      />
     </View>
-  );
+  )};
 }
 
 HomeScreen.navigationOptions = {
   header: null,
 };
-
-function DevelopmentModeNotice() {
-  if (__DEV__) {
-    const learnMoreButton = (
-      <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-        Learn more
-      </Text>
-    );
-
-    return (
-      <Text style={styles.developmentModeText}>
-        Development mode is enabled: your app will be slower but you can use useful development
-        tools. {learnMoreButton}
-      </Text>
-    );
-  } else {
-    return (
-      <Text style={styles.developmentModeText}>
-        You are not in development mode: your app will run at full speed.
-      </Text>
-    );
-  }
-}
-
-function handleLearnMorePress() {
-  WebBrowser.openBrowserAsync('https://docs.expo.io/versions/latest/workflow/development-mode/');
-}
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/get-started/create-a-new-app/#making-your-first-change'
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -175,5 +174,18 @@ const styles = StyleSheet.create({
   helpLinkText: {
     fontSize: 14,
     color: '#2e78b7',
+  },
+  item: {
+    padding: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+  },
+  item_text: { justifyContent: 'center', flex: 6 },
+  item_title: {
+    fontSize: 18,
+  },
+  item_detail: {
+    fontSize: 14,
   },
 });
