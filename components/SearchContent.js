@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyleSheet, FlatList, Text, View, Button } from 'react-native';
 
-export default class SearchList extends React.Component {
+export default class SearchContent extends React.Component {
     state = {
         refresh: false,
         data: [],
@@ -20,6 +20,7 @@ export default class SearchList extends React.Component {
     }
 
     viewFood(query) {
+        // get Nutrients
         fetch(`https://trackapi.nutritionix.com/v2/natural/nutrients`, {
             method: 'POST', redirect: 'follow',
             headers: {
@@ -36,6 +37,7 @@ export default class SearchList extends React.Component {
             const nutritionixPayload = responseJson.foods[0];
             this.setState({ food: nutritionixPayload, data: [] });
             
+            // get Score
             fetch(`https://us-central1-gini-v0.cloudfunctions.net/analyseNutritionixTest`, {
                 method: 'POST',
                 redirect: 'follow',
@@ -53,7 +55,6 @@ export default class SearchList extends React.Component {
                 this.setState({ food: food, });
             })
             .catch((error) => { console.error('API error', error); });
-
         })
         .catch((error) => { console.error(error); });
     }

@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { StyleSheet, FlatList, Text, View, TouchableOpacity, TextInput } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 
-import SearchList from '../components/SearchList';
+import SearchContent from '../components/SearchContent';
 
-export default class LinksScreen extends React.Component {
+export default class SearchScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = { searchText: '', refreshList: false };
@@ -49,7 +49,7 @@ export default class LinksScreen extends React.Component {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
 
-        <Text>Use the searchbar to look for foods</Text>
+        <Text style={{margin: 10}}>Use the searchbar to look for foods</Text>
       
         <TextInput
           style={styles.searchbar}
@@ -58,7 +58,7 @@ export default class LinksScreen extends React.Component {
           onSubmitEditing={() => { this.getFood() }}
         />
 
-        <SearchList data={this.data} refresh={this.state.refreshList} />
+        <SearchContent data={this.data} refresh={this.state.refreshList} />
 
       </ScrollView>
     );
