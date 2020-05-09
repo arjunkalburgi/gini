@@ -5,13 +5,16 @@ import { Image, Platform, StyleSheet, Text, FlatList, Button, View } from 'react
 export default class HomeScreen extends React.Component {
   state = {
     data: [],
+    refresh: false,
   }
-
-  componentWillMount() {
+  constructor(props) { 
+    super(props);
     this.getLog();
   }
+  componentWillMount() { this.getLog(); }
 
   getLog() {
+    console.log('before get');
     fetch(`https://us-central1-gini-v0.cloudfunctions.net/getLogTest`, {
       method: 'GET',
       redirect: 'follow',
@@ -23,13 +26,14 @@ export default class HomeScreen extends React.Component {
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      console.table(responseJson);
-      this.setState({ data: responseJson });
+      console.log('after get');
+      this.setState({ refresh: !this.state.refresh, data: responseJson })
     })
     .catch((error) => { console.error('API error', error); });
   }
 
-  delFood(idstr) {
+  delFood = (idstr) => {
+    console.log('before del');
     fetch(`https://us-central1-gini-v0.cloudfunctions.net/deleteLogTest`, {
       method: 'POST',
       redirect: 'follow',
@@ -38,12 +42,11 @@ export default class HomeScreen extends React.Component {
         'content-type': 'application/json',
         Accept: 'application/json',
       },
-      body: JSON.stringify({ id: idstr }),
+      body: JSON.stringify({ "id": idstr })
     })
-    .then((response) => response.json())
-    .then((responseJson) => {
-      console.table(responseJson);
-      this.setState({ data: responseJson });
+    .then(() => {
+      console.log('after del');
+      this.getLog();
     })
     .catch((error) => { console.error('API error', error); });
   }
