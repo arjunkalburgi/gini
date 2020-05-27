@@ -11,7 +11,8 @@ export default class HomeScreen extends React.Component {
     super(props);
     this.getLog();
   }
-  componentWillMount() { this.getLog(); }
+
+  componentDidMount() { this.getLog(); }
 
   getLog() {
     console.log('before get');
